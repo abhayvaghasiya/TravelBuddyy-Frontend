@@ -1,10 +1,14 @@
 import axios from 'axios';
-import { AgeGroup, Destination, DestinationDetail, ItineraryRequest, ItineraryResponse } from '../types';
+import {
+  AgeGroup,
+  Destination,
+  DestinationDetail,
+  ItineraryRequest,
+  ItineraryResponse,
+} from '../types';
 
-// For Vite, we need to use import.meta.env properly
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? process.env.VITE_API_BASE_URL 
-  : 'http://localhost:8080/api';
+// ✅ Use Vite's environment variable API
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -17,18 +21,11 @@ export const getDestinations = async (
   ageGroup?: AgeGroup,
   budget?: number
 ): Promise<Destination[]> => {
-  let url = '/destinations';
   const params: Record<string, string | number> = {};
+  if (ageGroup) params.ageGroup = ageGroup;
+  if (budget) params.budget = budget;
 
-  if (ageGroup) {
-    params.ageGroup = ageGroup;
-  }
-
-  if (budget) {
-    params.budget = budget;
-  }
-
-  const response = await apiClient.get(url, { params });
+  const response = await apiClient.get('/destinations', { params });
   return response.data;
 };
 
@@ -42,4 +39,4 @@ export const createItinerary = async (
 ): Promise<ItineraryResponse> => {
   const response = await apiClient.post('/itinerary', request);
   return response.data;
-}; 
+};
